@@ -43,7 +43,8 @@
           shellHook = ''
             export PS3DEV="$PWD/ps3"
             export PSL1GHT="$PS3DEV"
-            export PATH="$PATH:$PS3DEV/bin:$PS3DEV/ppu/bin:$PS3DEV/spu/bin"
+            export PATH="$PATH:$PS3DEV/bin:$PS3DEV/ppu/bin:$PS3DEV/spu/bin:$PS3DEV/portlibs/ppu/bin"
+            export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$PS3DEV/portlibs/ppu/lib/pkgconfig"
           '';
         };
       }
