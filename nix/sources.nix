@@ -73,4 +73,14 @@
       };
     };
   };
+  gdb = with gdb; {
+    pname = "gdb";
+    version = "8.3.1";
+    name = "${pname}-${version}.tar.xz";
+    src = pkgs.fetchurl {
+      inherit pname version;
+      url = "https://ftp.gnu.org/gnu/${pname}/${name}";
+      sha256 = "sha256-Js5lUhbNA/RhFRinocMdgOyOiEwWcV6bqLQ2gi5RQ0s=";
+    };
+  };
 }

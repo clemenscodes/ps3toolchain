@@ -22,6 +22,7 @@ bash
     tar xfvj ${dependencies.isl.name}
     cat ${../../patches/${pname}-${version}-PS3-PPU.patch} | patch -p1 -d ${pname}-${version}
     cat ${../../patches/${sources.newlib.pname}-${sources.newlib.version}-PS3.patch} | patch -p1 -d ${sources.newlib.pname}-${sources.newlib.version}
+    cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub ${pname}-${version}
     cd ${pname}-${version}
     ln -s ../${sources.newlib.pname}-${sources.newlib.version}/newlib newlib
     ln -s ../${sources.newlib.pname}-${sources.newlib.version}/libgloss libgloss

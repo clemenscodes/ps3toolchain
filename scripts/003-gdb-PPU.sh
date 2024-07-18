@@ -35,10 +35,10 @@ cd ${GDB}/build-ppu
 
 ## Configure the build.
 ../configure --prefix="$PS3DEV/ppu" --target="powerpc64-ps3-elf" \
-    --disable-multilib \
-    --disable-nls \
-    --disable-sim \
-    --disable-werror
+  --disable-multilib \
+  --disable-nls \
+  --disable-sim \
+  --disable-werror
 
 ## Compile and install.
 PROCS="$(nproc --all 2>&1)" || ret=$?
