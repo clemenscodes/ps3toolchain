@@ -10,7 +10,7 @@ bash
     cd $out/build
     cp -r ${src} ${name}
     tar xvfj ${name}
-    cat ${../../patches/${pname}-${version}-PS3-PPU.patch} | patch -p1 -d ${pname}-${version}
+    cat ${../../../../patches/${pname}-${version}-PS3-PPU.patch} | patch -p1 -d ${pname}-${version}
     cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub ${pname}-${version}
     mkdir -p ${pname}-${version}/build-ppu
     cd ${pname}-${version}/build-ppu

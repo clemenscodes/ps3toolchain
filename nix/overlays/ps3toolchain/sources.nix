@@ -80,7 +80,7 @@
     src = pkgs.fetchurl {
       inherit pname version;
       url = "https://ftp.gnu.org/gnu/${pname}/${name}";
-      sha256 = "sha256-Js5lUhbNA/RhFRinocMdgOyOiEwWcV6bqLQ2gi5RQ0s=";
+      sha256 = "sha256-HlW0183KezS+EvTOrmUWI6pzsv1kAVIxP59mpxSXV8Q=";
     };
   };
 }
