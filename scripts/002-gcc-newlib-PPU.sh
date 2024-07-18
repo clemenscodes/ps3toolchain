@@ -50,23 +50,24 @@ cd ${GCC}/build-ppu
 CFLAGS="${CFLAGS/-Werror=format-security/}"
 CXXFLAGS="${CXXFLAGS/-Werror=format-security/}"
 ../configure --prefix="$PS3DEV/ppu" --target="powerpc64-ps3-elf" \
-		--with-cpu="cell" \
-		--with-newlib \
-		--with-system-zlib \
-		--enable-languages="c,c++" \
-		--enable-long-double-128 \
-		--enable-lto \
-		--enable-threads \
-		--enable-newlib-multithread \
-		--enable-newlib-hw-fp \
-		--disable-dependency-tracking \
-		--disable-libcc1 \
-		--disable-multilib \
-		--disable-nls \
-		--disable-shared \
-		--disable-win32-registry
+  --with-cpu="cell" \
+  --with-newlib \
+  --with-system-zlib \
+  --enable-languages="c,c++" \
+  --enable-long-double-128 \
+  --enable-lto \
+  --enable-threads \
+  --enable-newlib-multithread \
+  --enable-newlib-hw-fp \
+  --disable-dependency-tracking \
+  --disable-libcc1 \
+  --disable-multilib \
+  --disable-nls \
+  --disable-shared \
+  --disable-win32-registry
 
 ## Compile and install.
 PROCS="$(nproc --all 2>&1)" || ret=$?
 if [ ! -z $ret ]; then PROCS=4; fi
 ${MAKE:-make} -j $PROCS all && ${MAKE:-make} install
+
