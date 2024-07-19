@@ -8,7 +8,7 @@ bash
 */
   ''
     cd $out/build
-    [ ! -d ${src} ] && cp -r ${src} ${name}
+    [ ! -d ${name} ] && cp -r ${src} ${name}
     tar xfv ${name}
     cat ${./patches/${pname}-${version}-PS3.patch} | patch -p1 -d ${pname}-${version}
     cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub ${pname}-${version}
