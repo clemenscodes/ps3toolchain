@@ -8,12 +8,12 @@ bash
 */
   ''
     cd $out/build
-    cp -r ${src} ${name}
-    cp -r ${sources.newlib.src} ${sources.newlib.name}
-    cp -r ${dependencies.mpc.src} ${dependencies.mpc.name}
-    cp -r ${dependencies.mpfr.src} ${dependencies.mpfr.name}
-    cp -r ${dependencies.gmp.src} ${dependencies.gmp.name}
-    cp -r ${dependencies.isl.src} ${dependencies.isl.name}
+    [ ! -d ${src} ] && cp -r ${src} ${name}
+    [ ! -d ${sources.newlib.src} ] && cp -r ${sources.newlib.src} ${sources.newlib.name}
+    [ ! -d ${dependencies.mpc.src} ] && cp -r ${dependencies.mpc.src} ${dependencies.mpc.name}
+    [ ! -d ${dependencies.mpfr.src} ] && cp -r ${dependencies.mpfr.src} ${dependencies.mpfr.name}
+    [ ! -d ${dependencies.gmp.src} ] && cp -r ${dependencies.gmp.src} ${dependencies.gmp.name}
+    [ ! -d ${dependencies.isl.src} ] && cp -r ${dependencies.isl.src} ${dependencies.isl.name}
     tar xfvJ ${name}
     tar xfvz ${sources.newlib.name}
     tar xfv ${dependencies.mpc.name}
