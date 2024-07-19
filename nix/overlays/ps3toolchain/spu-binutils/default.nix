@@ -8,9 +8,9 @@ bash
 */
   ''
     cd $out/build
-    [ ! -d ${name} ] && cp -r ${src} ${name}
-    tar xvfj ${name}
-    cat ${./patches/${pname}-${version}-PS3-SPU.patch} | patch -p1 -d ${pname}-${version}
+    copy_if_not_exists ${src} ${name}
+    extract_if_not_exists ${name} xvfj ${pname}-${version}
+    apply_patch_if_not_applied ${./patches/${pname}-${version}-PS3-SPU.patch} ${pname}-${version}
     cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub ${pname}-${version}
     mkdir -p ${pname}-${version}/build-spu
     cd ${pname}-${version}/build-spu

@@ -8,28 +8,28 @@ bash
 */
   ''
     cd $out/build
-    [ ! -d ${name} ] && cp -r ${src} ${name}
-    [ ! -d ${sources.newlib.name} ] && cp -r ${sources.newlib.src} ${sources.newlib.name}
-    [ ! -d ${dependencies.mpc.name} ] && cp -r ${dependencies.mpc.src} ${dependencies.mpc.name}
-    [ ! -d ${dependencies.mpfr.name} ] && cp -r ${dependencies.mpfr.src} ${dependencies.mpfr.name}
-    [ ! -d ${dependencies.gmp.name} ] && cp -r ${dependencies.gmp.src} ${dependencies.gmp.name}
-    [ ! -d ${dependencies.isl.name} ] && cp -r ${dependencies.isl.src} ${dependencies.isl.name}
-    tar xfvJ ${name}
-    tar xfvz ${sources.newlib.name}
-    tar xfv ${dependencies.mpc.name}
-    tar xfvj ${dependencies.mpfr.name}
-    tar xfvj ${dependencies.gmp.name}
-    tar xfvj ${dependencies.isl.name}
-    cat ${./patches/${pname}-${version}-PS3-PPU.patch} | patch -p1 -d ${pname}-${version}
-    cat ${./patches/${sources.newlib.pname}-${sources.newlib.version}-PS3.patch} | patch -p1 -d ${sources.newlib.pname}-${sources.newlib.version}
+    copy_if_not_exists ${src} ${name}
+    copy_if_not_exists ${sources.newlib.src} ${sources.newlib.name}
+    copy_if_not_exists ${dependencies.mpc.src} ${dependencies.mpc.name}
+    copy_if_not_exists ${dependencies.mpfr.src} ${dependencies.mpfr.name}
+    copy_if_not_exists ${dependencies.gmp.src} ${dependencies.gmp.name}
+    copy_if_not_exists ${dependencies.isl.src} ${dependencies.isl.name}
+    extract_if_not_exists ${name} xfvJ ${pname}-${version}
+    extract_if_not_exists ${sources.newlib.name} xfvz ${sources.newlib.pname}-${sources.newlib.version}
+    extract_if_not_exists ${dependencies.mpc.name} xfv ${dependencies.mpc.pname}-${dependencies.mpc.version}
+    extract_if_not_exists ${dependencies.mpfr.name} xfvj ${dependencies.mpfr.pname}-${dependencies.mpfr.version}
+    extract_if_not_exists ${dependencies.gmp.name} xfvj ${dependencies.gmp.pname}-${dependencies.gmp.version}
+    extract_if_not_exists ${dependencies.isl.name} xfvj ${dependencies.isl.pname}-${dependencies.isl.version}
+    apply_patch_if_not_applied ${./patches/${pname}-${version}-PS3-PPU.patch} ./${pname}-${version}
+    apply_patch_if_not_applied ${./patches/${sources.newlib.pname}-${sources.newlib.version}-PS3.patch} ./${sources.newlib.pname}-${sources.newlib.version}
     cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub ${pname}-${version}
     cd ${pname}-${version}
-    ln -s ../${sources.newlib.pname}-${sources.newlib.version}/newlib newlib
-    ln -s ../${sources.newlib.pname}-${sources.newlib.version}/libgloss libgloss
-    ln -s ../${dependencies.mpc.pname}-${dependencies.mpc.version} ${dependencies.mpc.pname}
-    ln -s ../${dependencies.mpfr.pname}-${dependencies.mpfr.version} ${dependencies.mpfr.pname}
-    ln -s ../${dependencies.gmp.pname}-${dependencies.gmp.version} ${dependencies.gmp.pname}
-    ln -s ../${dependencies.isl.pname}-${dependencies.isl.version} ${dependencies.isl.pname}
+    symlink_if_not_exists ../${sources.newlib.pname}-${sources.newlib.version}/newlib newlib
+    symlink_if_not_exists ../${sources.newlib.pname}-${sources.newlib.version}/libgloss libgloss
+    symlink_if_not_exists ../${dependencies.mpc.pname}-${dependencies.mpc.version} ${dependencies.mpc.pname}
+    symlink_if_not_exists ../${dependencies.mpfr.pname}-${dependencies.mpfr.version} ${dependencies.mpfr.pname}
+    symlink_if_not_exists ../${dependencies.gmp.pname}-${dependencies.gmp.version} ${dependencies.gmp.pname}
+    symlink_if_not_exists ../${dependencies.isl.pname}-${dependencies.isl.version} ${dependencies.isl.pname}
     mkdir build-ppu
     cd build-ppu
     ../configure --prefix="$PS3DEV/ppu" --target="powerpc64-ps3-elf" \
