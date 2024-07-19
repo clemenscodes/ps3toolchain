@@ -14,12 +14,23 @@
   }:
     flake-utils.lib.eachDefaultSystem (
       system: let
+        inherit (pkgs) lib;
         pkgs = import nixpkgs {
           inherit system;
           overlays = import ./nix/overlays {inherit pkgs;};
+          config = {
+            allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) ["nvidia-cg-toolkit"];
+          };
         };
       in {
-        defaultPackage = pkgs.ps3toolchain;
+        defaultPackage = pkgs.psl1ght;
+        devShell = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            # ps3toolchain
+            psl1ght
+            # ps3libraries
+          ];
+        };
       }
     );
 }
