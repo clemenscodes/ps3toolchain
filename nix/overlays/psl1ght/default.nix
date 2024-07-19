@@ -24,6 +24,7 @@ in
         gnumake
         gnupatch
         texinfo
+        nvidia_cg_toolkit
       ];
       buildInputs = with prev; [wget python310];
       hardeningDisable = ["format"];
