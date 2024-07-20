@@ -1,14 +1,17 @@
-{
-  pkgs,
-  sources,
-}:
-with sources.ppu-gdb; let
+{pkgs}: let
   scripts = import ../../scripts {inherit pkgs;};
   shared = import ../../shared.nix {inherit pkgs;};
 in
-  pkgs.stdenv.mkDerivation {
+  pkgs.stdenv.mkDerivation rec {
     inherit (shared) nativeBuildInputs buildInputs hardeningDisable;
-    name = "ppu-gdb";
+    pname = "ppu-gdb";
+    version = "8.3.1";
+    name = "${pname}-${version}-PS3";
+    src = pkgs.fetchurl {
+      inherit pname version;
+      url = "https://ftp.gnu.org/gnu/gdb/gdb-${version}.tar.xz";
+      sha256 = "sha256-HlW0183KezS+EvTOrmUWI6pzsv1kAVIxP59mpxSXV8Q=";
+    };
     phases = "installPhase";
     installPhase =
       /*
@@ -19,12 +22,12 @@ in
         cd $out/build
         export PS3DEV="$out/ps3"
         export PSL1GHT="$PS3DEV"
-        ${scripts.copy}/bin/copy_if_not_exists ${src} ${name}
-        ${scripts.extract}/bin/extract_if_not_exists ${name} xvf ${pname}-${version}
-        ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/${pname}-${version}-PS3.patch} ${pname}-${version}
-        cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub ${pname}-${version}
-        mkdir -p ${pname}-${version}/build-ppu
-        cd ${pname}-${version}/build-ppu
+        ${scripts.copy}/bin/copy_if_not_exists ${src} ${name}.tar.xz
+        ${scripts.extract}/bin/extract_if_not_exists ${name}.tar.xz xvf gdb-${version}
+        ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/gdb-${version}-PS3.patch} gdb-${version}
+        cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub gdb-${version}
+        mkdir -p gdb-${version}/build-ppu
+        cd gdb-${version}/build-ppu
         ../configure --prefix="$PS3DEV/ppu" --target="powerpc64-ps3-elf" \
           --disable-multilib \
           --disable-nls \
@@ -33,7 +36,6 @@ in
         PROCS="$(nproc --all 2>&1)" || ret=$?
         if [ ! -z $ret ]; then PROCS=4; fi
         make -j $PROCS && make libdir=`pwd`/host-libs/lib install
-
         cd $out
         mv $out/ps3/* $out
         rm -rf $out/ps3 $out/build

@@ -117,24 +117,4 @@
       };
     };
   };
-  ppu-gdb = with ppu-gdb; {
-    pname = "gdb";
-    version = "8.3.1";
-    name = "${pname}-${version}.tar.xz";
-    src = pkgs.fetchurl {
-      inherit pname version;
-      url = "https://ftp.gnu.org/gnu/${pname}/${name}";
-      sha256 = "sha256-HlW0183KezS+EvTOrmUWI6pzsv1kAVIxP59mpxSXV8Q=";
-    };
-  };
-  spu-gdb = with spu-gdb; {
-    pname = "gdb";
-    version = "8.3.1";
-    name = "${pname}-${version}.tar.xz";
-    src = pkgs.fetchurl {
-      inherit pname version;
-      url = "https://ftp.gnu.org/gnu/${pname}/${name}";
-      sha256 = "sha256-HlW0183KezS+EvTOrmUWI6pzsv1kAVIxP59mpxSXV8Q=";
-    };
-  };
 }
