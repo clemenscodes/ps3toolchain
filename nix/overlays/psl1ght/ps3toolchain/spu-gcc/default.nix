@@ -1,15 +1,70 @@
-{
-  pkgs,
-  sources,
-}:
-with sources.spu-gcc; let
+{pkgs}: let
+  mkUrl = pkg: "https://gcc.gnu.org/pub/gcc/infrastructure/${pkg}";
+  prefix = "spu";
   spu-binutils = import ../spu-binutils {inherit pkgs;};
   scripts = import ../../scripts {inherit pkgs;};
   shared = import ../../shared.nix {inherit pkgs;};
+  newlib = with newlib; {
+    pname = "${prefix}-newlib";
+    version = "1.20.0";
+    name = "${pname}-${version}.tar.gz";
+    src = pkgs.fetchurl {
+      inherit pname version;
+      url = "ftp://sourceware.org/pub/newlib/newlib-${version}.tar.gz";
+      sha256 = "14pn7y1dm8vsm9lszfgkcz3sgdgsv1lxmpf2prbqq9s4fa2b4i66";
+    };
+  };
+  mpfr = with mpfr; {
+    pname = "${prefix}-mpfr";
+    version = "3.1.4";
+    name = "${pname}-${version}.tar.bz2";
+    src = pkgs.fetchurl {
+      inherit name pname version;
+      url = mkUrl "mpfr-${version}.tar.bz2";
+      sha256 = "sha256-0xA6gM2tJAftWB82GMS+0E4MktHPdxpl6tZizDl/d3U=";
+    };
+  };
+  mpc = with mpc; {
+    pname = "${prefix}-mpc";
+    version = "1.0.3";
+    name = "${pname}-${version}.tar.gz";
+    src = pkgs.fetchurl {
+      inherit name pname version;
+      url = mkUrl "mpc-${version}.tar.gz";
+      sha256 = "sha256-YX3sxuoJiJ+wjt4zCRegCxaAm424jCnDG/u0nL+I7MM=";
+    };
+  };
+  gmp = with gmp; {
+    pname = "${prefix}-gmp";
+    version = "6.1.0";
+    name = "${pname}-${version}.tar.bz2";
+    src = pkgs.fetchurl {
+      inherit name pname version;
+      url = mkUrl "gmp-${version}.tar.bz2";
+      sha256 = "sha256-SYRJqZTv66UniFwQQFmTQnmV0/hrh2jYzfjZ3Xxrc+g";
+    };
+  };
+  isl = with isl; {
+    pname = "${prefix}-isl";
+    version = "0.18";
+    name = "${pname}-${version}.tar.bz2";
+    src = pkgs.fetchurl {
+      inherit name pname version;
+      url = mkUrl "isl-${version}.tar.bz2";
+      sha256 = "sha256-a4sP1/gdCpV76zZ5yBu7NMzHVo1WgoRNiSRCSg2tyxs=";
+    };
+  };
 in
-  pkgs.stdenv.mkDerivation {
+  pkgs.stdenv.mkDerivation rec {
     inherit (shared) nativeBuildInputs buildInputs hardeningDisable;
-    name = "spu-gcc";
+    pname = "${prefix}-gcc";
+    version = "9.5.0";
+    name = "${pname}-${version}-PS3";
+    src = pkgs.fetchurl {
+      inherit pname version;
+      url = "https://ftp.gnu.org/gnu/gcc/gcc-${version}/gcc-${version}.tar.xz";
+      sha256 = "sha256-J3afZO8dTNXivoaCwMk/mIeYPmz9GpJ85aCikVqVz48=";
+    };
     phases = "installPhase";
     installPhase =
       /*
@@ -21,28 +76,28 @@ in
         export PSL1GHT="$PS3DEV"
         ${scripts.symlinks}/bin/create_symlinks ${spu-binutils} $PS3DEV
         cd $out/build
-        ${scripts.copy}/bin/copy_if_not_exists ${src} ${name}
-        ${scripts.copy}/bin/copy_if_not_exists ${sources.newlib.src} ${sources.newlib.name}
-        ${scripts.copy}/bin/copy_if_not_exists ${dependencies.mpc.src} ${dependencies.mpc.name}
-        ${scripts.copy}/bin/copy_if_not_exists ${dependencies.mpfr.src} ${dependencies.mpfr.name}
-        ${scripts.copy}/bin/copy_if_not_exists ${dependencies.gmp.src} ${dependencies.gmp.name}
-        ${scripts.copy}/bin/copy_if_not_exists ${dependencies.isl.src} ${dependencies.isl.name}
-        ${scripts.extract}/bin/extract_if_not_exists ${name} xfvJ ${pname}-${version}
-        ${scripts.extract}/bin/extract_if_not_exists ${sources.newlib.name} xfvz ${sources.newlib.pname}-${sources.newlib.version}
-        ${scripts.extract}/bin/extract_if_not_exists ${dependencies.mpc.name} xfv ${dependencies.mpc.pname}-${dependencies.mpc.version}
-        ${scripts.extract}/bin/extract_if_not_exists ${dependencies.mpfr.name} xfvj ${dependencies.mpfr.pname}-${dependencies.mpfr.version}
-        ${scripts.extract}/bin/extract_if_not_exists ${dependencies.gmp.name} xfvj ${dependencies.gmp.pname}-${dependencies.gmp.version}
-        ${scripts.extract}/bin/extract_if_not_exists ${dependencies.isl.name} xfvj ${dependencies.isl.pname}-${dependencies.isl.version}
-        ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/${pname}-${version}-PS3-SPU.patch} ./${pname}-${version}
-        ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/${sources.newlib.pname}-${sources.newlib.version}-PS3.patch} ./${sources.newlib.pname}-${sources.newlib.version}
-        cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub ${pname}-${version}
-        cd ${pname}-${version}
-        ${scripts.symlink}/bin/symlink_if_not_exists ../${sources.newlib.pname}-${sources.newlib.version}/newlib newlib
-        ${scripts.symlink}/bin/symlink_if_not_exists ../${sources.newlib.pname}-${sources.newlib.version}/libgloss libgloss
-        ${scripts.symlink}/bin/symlink_if_not_exists ../${dependencies.mpc.pname}-${dependencies.mpc.version} ${dependencies.mpc.pname}
-        ${scripts.symlink}/bin/symlink_if_not_exists ../${dependencies.mpfr.pname}-${dependencies.mpfr.version} ${dependencies.mpfr.pname}
-        ${scripts.symlink}/bin/symlink_if_not_exists ../${dependencies.gmp.pname}-${dependencies.gmp.version} ${dependencies.gmp.pname}
-        ${scripts.symlink}/bin/symlink_if_not_exists ../${dependencies.isl.pname}-${dependencies.isl.version} ${dependencies.isl.pname}
+        ${scripts.copy}/bin/copy_if_not_exists ${src} ${name}.tar.xz
+        ${scripts.copy}/bin/copy_if_not_exists ${newlib.src} ${newlib.name}.tar.gz
+        ${scripts.copy}/bin/copy_if_not_exists ${mpc.src} ${mpc.name}.tar.gz
+        ${scripts.copy}/bin/copy_if_not_exists ${mpfr.src} ${mpfr.name}.tar.bz2
+        ${scripts.copy}/bin/copy_if_not_exists ${gmp.src} ${gmp.name}.tar.bz2
+        ${scripts.copy}/bin/copy_if_not_exists ${isl.src} ${isl.name}.tar.bz2
+        ${scripts.extract}/bin/extract_if_not_exists ${name}.tar.xz xfvJ gcc-${version}
+        ${scripts.extract}/bin/extract_if_not_exists ${newlib.name}.tar.gz xfvz newlib-${newlib.version}
+        ${scripts.extract}/bin/extract_if_not_exists ${mpc.name}.tar.gz xfv mpc-${mpc.version}
+        ${scripts.extract}/bin/extract_if_not_exists ${mpfr.name}.tar.bz2 xfvj mpfr-${mpfr.version}
+        ${scripts.extract}/bin/extract_if_not_exists ${gmp.name}.tar.bz2 xfvj gmp-${gmp.version}
+        ${scripts.extract}/bin/extract_if_not_exists ${isl.name}.tar.bz2 xfvj isl-${isl.version}
+        ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/${pname}-${version}-PS3.patch} ./gcc-${version}
+        ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/${newlib.pname}-${newlib.version}-PS3.patch} ./newlib-${newlib.version}
+        cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub gcc-${version}
+        cd gcc-${version}
+        ${scripts.symlink}/bin/symlink_if_not_exists ../newlib-${newlib.version}/newlib newlib
+        ${scripts.symlink}/bin/symlink_if_not_exists ../newlib-${newlib.version}/libgloss libgloss
+        ${scripts.symlink}/bin/symlink_if_not_exists ../mpc-${mpc.version} mpc
+        ${scripts.symlink}/bin/symlink_if_not_exists ../mpfr-${mpfr.version} mpfr
+        ${scripts.symlink}/bin/symlink_if_not_exists ../gmp-${gmp.version} gmp
+        ${scripts.symlink}/bin/symlink_if_not_exists ../isl-${isl.version} isl
         mkdir -p build-spu
         cd build-spu
         unset CFLAGS CXXFLAGS LDFLAGS
