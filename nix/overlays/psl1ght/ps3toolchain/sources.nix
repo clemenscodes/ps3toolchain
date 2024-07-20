@@ -1,14 +1,4 @@
 {pkgs}: rec {
-  spu-binutils = with spu-binutils; {
-    pname = "binutils";
-    version = "2.22";
-    name = "${pname}-${version}.tar.bz2";
-    src = pkgs.fetchurl {
-      inherit pname version;
-      url = "https://ftp.gnu.org/gnu/${pname}/${name}";
-      sha256 = "sha256-bHr47RyM+bS51ub+CaPh09R5/mOYS6i5smvzVrYxPKk=";
-    };
-  };
   newlib = with newlib; {
     pname = "newlib";
     version = "1.20.0";

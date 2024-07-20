@@ -6,7 +6,7 @@ in
     inherit (shared) nativeBuildInputs buildInputs hardeningDisable;
     pname = "ppu-binutils";
     version = "2.42";
-    name = "${pname}-${version}";
+    name = "${pname}-${version}-PS3";
     src = pkgs.fetchurl {
       inherit pname version;
       url = "https://ftp.gnu.org/gnu/binutils/binutils-${version}.tar.bz2";

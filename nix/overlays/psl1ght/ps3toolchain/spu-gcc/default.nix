@@ -3,7 +3,7 @@
   sources,
 }:
 with sources.spu-gcc; let
-  spu-binutils = import ../spu-binutils {inherit pkgs sources;};
+  spu-binutils = import ../spu-binutils {inherit pkgs;};
   scripts = import ../../scripts {inherit pkgs;};
   shared = import ../../shared.nix {inherit pkgs;};
 in
