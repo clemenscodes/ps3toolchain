@@ -8,11 +8,20 @@
   shared = import ../shared.nix {inherit pkgs;};
 in
   pkgs.stdenv.mkDerivation {
-    inherit (shared) nativeBuildInputs buildInputs hardeningDisable;
-    passthru = {inherit ppu-binutils spu-binutils ppu-gcc spu-gcc ppu-gdb spu-gdb;};
     name = "ps3toolchain";
     phases = "installPhase";
+    inherit (shared) nativeBuildInputs buildInputs hardeningDisable;
     installPhase = ''
       mkdir -p $out
     '';
+    passthru = {
+      inherit
+        ppu-binutils
+        spu-binutils
+        ppu-gcc
+        spu-gcc
+        ppu-gdb
+        spu-gdb
+        ;
+    };
   }

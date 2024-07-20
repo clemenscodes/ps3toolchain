@@ -1,5 +1,6 @@
 {pkgs}: let
   ps3toolchain = import ./ps3toolchain {inherit pkgs;};
+  ps3libraries = import ./ps3libraries {inherit pkgs;};
   scripts = import ./scripts {inherit pkgs;};
   shared = import ./shared.nix {inherit pkgs;};
 in (final: prev: {
@@ -14,7 +15,6 @@ in (final: prev: {
     };
     nativeBuildInputs = shared.nativeBuildInputs ++ [prev.nvidia_cg_toolkit];
     inherit (shared) buildInputs hardeningDisable;
-    passthru = {inherit ps3toolchain;};
     phases = "unpackPhase buildPhase installPhase fixupPhase";
     unpackPhase = ''
       export PS3DEV=${placeholder "out"}
@@ -63,46 +63,13 @@ in (final: prev: {
       for i in `ls powerpc64-ps3-elf-* | cut -c19-`; do
         ln -s $(realpath powerpc64-ps3-elf-$i) ppu-$i
       done
+      ${prev.rsync}/bin/rsync -rLtvh ${ps3libraries}/* $out/portlibs
     '';
-    # installPhase =
-    #   /*
-    #   bash
-    #   */
-    #   ''
-    #     mkdir -p $out/build
-    #     cp -r ${src} $out/build/${name}.tar.gz;
-    #     cd $out/build
-    #     if [ ! -d ${pname}-${version} ]; then
-    #       mkdir -p ${pname}-${version}
-    #       cd ${pname}-${version}
-    #       tar xvf ../${name}.tar.gz --strip-components=1
-    #     fi
-    #     ${scripts.symlinks}/bin/create_symlinks ${ps3toolchain.ppu-binutils} $out
-    #     ${scripts.symlinks}/bin/create_symlinks ${ps3toolchain.ppu-gcc} $out
-    #     ${scripts.symlinks}/bin/create_symlinks ${ps3toolchain.ppu-gdb} $out
-    #     ${scripts.symlinks}/bin/create_symlinks ${ps3toolchain.spu-binutils} $out
-    #     ${scripts.symlinks}/bin/create_symlinks ${ps3toolchain.spu-gcc} $out
-    #     ${scripts.symlinks}/bin/create_symlinks ${ps3toolchain.spu-gdb} $out
-    #     ln -s $out/ppu/powerpc64-ps3-elf $out/ppu/ppu
-    #     cd $out/ppu/bin
-    #     for i in `ls powerpc64-ps3-elf-* | cut -c19-`; do
-    #       ln -s $out/ppu/bin/powerpc64-ps3-elf-$i $out/ppu/bin/ppu-$i
-    #     done
-    #     export PS3DEV="$out"
-    #     export PSL1GHT="$PS3DEV"
-    #     export PATH="$PATH:$out/ppu/bin:$out/spu/bin:$out/bin"
-    #     cd $out/build/${pname}-${version}
-    #     make install-ctrl
-    #     make
-    #     make install
-    #     rm $out/ppu/bin/powerpc64-ps3-elf-* $out/spu/bin/*
-    #     ${prev.rsync}/bin/rsync -rLtvh ${ps3toolchain.ppu-binutils}/ppu/bin/* $out/ppu/bin
-    #     ${prev.rsync}/bin/rsync -rLtvh ${ps3toolchain.ppu-gcc}/ppu/bin/* $out/ppu/bin
-    #     ${prev.rsync}/bin/rsync -rLtvh ${ps3toolchain.ppu-gdb}/ppu/bin/* $out/ppu/bin
-    #     ${prev.rsync}/bin/rsync -rLtvh ${ps3toolchain.spu-binutils}/spu/bin/* $out/spu/bin
-    #     ${prev.rsync}/bin/rsync -rLtvh ${ps3toolchain.spu-gcc}/spu/bin/* $out/spu/bin
-    #     ${prev.rsync}/bin/rsync -rLtvh ${ps3toolchain.spu-gdb}/spu/bin/* $out/spu/bin
-    #     rm -rf $out/build
-    #   '';
+    passthru = {
+      inherit
+        ps3toolchain
+        ps3libraries
+        ;
+    };
   };
 })
