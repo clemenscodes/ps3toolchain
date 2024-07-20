@@ -1,14 +1,4 @@
 {pkgs}: rec {
-  ppu-binutils = with ppu-binutils; {
-    pname = "binutils";
-    version = "2.42";
-    name = "${pname}-${version}.tar.bz2";
-    src = pkgs.fetchurl {
-      inherit pname version;
-      url = "https://ftp.gnu.org/gnu/${pname}/${name}";
-      sha256 = "sha256-qlSFDr2lBkxyzU7C2bBWwpQlKZFIY1DZqXqypt/frxI=";
-    };
-  };
   spu-binutils = with spu-binutils; {
     pname = "binutils";
     version = "2.22";
@@ -155,16 +145,6 @@
       inherit pname version;
       url = "https://ftp.gnu.org/gnu/${pname}/${name}";
       sha256 = "sha256-HlW0183KezS+EvTOrmUWI6pzsv1kAVIxP59mpxSXV8Q=";
-    };
-  };
-  psl1ght = with psl1ght; {
-    pname = "PSL1GHT";
-    version = "e965e3d895e13f4d6118e14556e7791967060ce6";
-    name = "${pname}-${version}.tar.gz";
-    src = pkgs.fetchurl {
-      inherit pname version;
-      url = "https://github.com/ps3dev/${pname}/tarball/${version}";
-      sha256 = "sha256-bLrSAZyhoglKcTzKo+zPCPSfO4TmzKTM1dNBE8rtiXY=";
     };
   };
 }

@@ -3,7 +3,7 @@
   sources,
 }:
 with sources.ppu-gcc; let
-  ppu-binutils = import ../ppu-binutils {inherit pkgs sources;};
+  ppu-binutils = import ../ppu-binutils {inherit pkgs;};
   scripts = import ../../scripts {inherit pkgs;};
   shared = import ../../shared.nix {inherit pkgs;};
 in

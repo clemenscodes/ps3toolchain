@@ -2,7 +2,7 @@
   pkgs,
   sources,
 }: {
-  ppu-binutils = import ./ppu-binutils {inherit pkgs sources;};
+  ppu-binutils = import ./ppu-binutils {inherit pkgs;};
   spu-binutils = import ./spu-binutils {inherit pkgs sources;};
   ppu-gcc = import ./ppu-gcc {inherit pkgs sources;};
   spu-gcc = import ./spu-gcc {inherit pkgs sources;};

@@ -1,14 +1,17 @@
-{
-  pkgs,
-  sources,
-}:
-with sources.ppu-binutils; let
+{pkgs}: let
   scripts = import ../../scripts {inherit pkgs;};
   shared = import ../../shared.nix {inherit pkgs;};
 in
-  pkgs.stdenv.mkDerivation {
+  pkgs.stdenv.mkDerivation rec {
     inherit (shared) nativeBuildInputs buildInputs hardeningDisable;
-    name = "ppu-binutils";
+    pname = "ppu-binutils";
+    version = "2.42";
+    name = "${pname}-${version}";
+    src = pkgs.fetchurl {
+      inherit pname version;
+      url = "https://ftp.gnu.org/gnu/binutils/binutils-${version}.tar.bz2";
+      sha256 = "sha256-qlSFDr2lBkxyzU7C2bBWwpQlKZFIY1DZqXqypt/frxI=";
+    };
     phases = "installPhase";
     installPhase =
       /*
@@ -19,12 +22,12 @@ in
         export PS3DEV="$out/ps3"
         export PSL1GHT="$PS3DEV"
         cd $out/build
-        ${scripts.copy}/bin/copy_if_not_exists ${src} ${name}
-        ${scripts.extract}/bin/extract_if_not_exists ${name} xvfj ${pname}-${version}
-        ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/${pname}-${version}-PS3-PPU.patch} ${pname}-${version}
-        cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub ${pname}-${version}
-        mkdir -p ${pname}-${version}/build-ppu
-        cd ${pname}-${version}/build-ppu
+        ${scripts.copy}/bin/copy_if_not_exists ${src} ${name}.tar.bz2
+        ${scripts.extract}/bin/extract_if_not_exists ${name}.tar.bz2 xvfj binutils-${version}
+        ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/${pname}-${version}-PS3.patch} binutils-${version}
+        cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub binutils-${version}
+        mkdir -p binutils-${version}/build-ppu
+        cd binutils-${version}/build-ppu
         ../configure --prefix="$PS3DEV/ppu" --target="powerpc64-ps3-elf" \
           --disable-nls \
           --disable-shared \
