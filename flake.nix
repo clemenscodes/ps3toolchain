@@ -14,19 +14,26 @@
   }:
     flake-utils.lib.eachDefaultSystem (
       system: let
-        inherit (pkgs) lib;
         pkgs = import nixpkgs {
           inherit system;
           overlays = import ./nix/overlays {inherit pkgs;};
           config = {
-            allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) ["nvidia-cg-toolkit"];
+            allowUnfreePredicate = pkg: builtins.elem (pkgs.lib.getName pkg) ["nvidia-cg-toolkit"];
           };
         };
-      in {
-        defaultPackage = pkgs.psl1ght;
-        devShell = pkgs.mkShell {
-          buildInputs = with pkgs; [psl1ght];
-        };
-      }
+      in
+        with pkgs; {
+          defaultPackage = psl1ght;
+          devShell = mkShell {
+            buildInputs = [psl1ght];
+            shellHook = ''
+              export PS3DEV=${psl1ght}
+              export PSL1GHT=$PS3DEV
+              export PATH=$PATH:${psl1ght}/bin
+              export PATH=$PATH:${psl1ght}/ppu/bin
+              export PATH=$PATH:${psl1ght}/spu/bin
+            '';
+          };
+        }
     );
 }

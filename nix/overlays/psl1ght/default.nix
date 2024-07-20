@@ -15,10 +15,21 @@ in
         bash
         */
         ''
-          mkdir -p $out/build $out/ppu/ppu/lib
+          mkdir -p $out/build
+          ${scripts.symlinks}/bin/create_symlinks ${ps3toolchain.ppu-binutils} $out
+          ${scripts.symlinks}/bin/create_symlinks ${ps3toolchain.ppu-gcc} $out
+          ${scripts.symlinks}/bin/create_symlinks ${ps3toolchain.ppu-gdb} $out
+          ${scripts.symlinks}/bin/create_symlinks ${ps3toolchain.spu-binutils} $out
+          ${scripts.symlinks}/bin/create_symlinks ${ps3toolchain.spu-gcc} $out
+          ${scripts.symlinks}/bin/create_symlinks ${ps3toolchain.spu-gdb} $out
+          ln -s $out/ppu/powerpc64-ps3-elf $out/ppu/ppu
+          cd $out/ppu/bin
+          for i in `ls powerpc64-ps3-elf-* | cut -c19-`; do
+            ln -s $out/ppu/bin/powerpc64-ps3-elf-$i $out/ppu/bin/ppu-$i
+          done
           export PS3DEV="$out"
           export PSL1GHT="$PS3DEV"
-          export PATH="$PATH:${ps3toolchain}/ppu/bin:${ps3toolchain}/spu/bin"
+          export PATH="$PATH:$out/ppu/bin:$out/spu/bin:$out/bin"
           cd $out/build
           cp -r ${src} ${name}
           if [ ! -d ${pname}-${version} ]; then
@@ -30,8 +41,14 @@ in
           make install-ctrl
           make
           make install
+          rm $out/ppu/bin/powerpc64-ps3-elf-* $out/spu/bin/*
+          ${pkgs.rsync}/bin/rsync -rLtvh ${ps3toolchain.ppu-binutils}/ppu/bin/* $out/ppu/bin
+          ${pkgs.rsync}/bin/rsync -rLtvh ${ps3toolchain.ppu-gcc}/ppu/bin/* $out/ppu/bin
+          ${pkgs.rsync}/bin/rsync -rLtvh ${ps3toolchain.ppu-gdb}/ppu/bin/* $out/ppu/bin
+          ${pkgs.rsync}/bin/rsync -rLtvh ${ps3toolchain.spu-binutils}/spu/bin/* $out/spu/bin
+          ${pkgs.rsync}/bin/rsync -rLtvh ${ps3toolchain.spu-gcc}/spu/bin/* $out/spu/bin
+          ${pkgs.rsync}/bin/rsync -rLtvh ${ps3toolchain.spu-gdb}/spu/bin/* $out/spu/bin
           rm -rf $out/build
-          ${scripts.symlinks}/bin/create_symlinks ${ps3toolchain} $out
         '';
     };
   })
