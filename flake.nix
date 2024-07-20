@@ -23,12 +23,12 @@
           };
         };
       in {
-        defaultPackage = pkgs.ps3libraries;
+        defaultPackage = pkgs.psl1ght;
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
             ps3toolchain
-            psl1ght
-            ps3libraries
+            # psl1ght
+            # ps3libraries
           ];
         };
       }

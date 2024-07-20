@@ -1,44 +1,23 @@
 {pkgs}: let
-  sources = import ./sources.nix {inherit pkgs;};
+  sources = import ../sources.nix {inherit pkgs;};
+  shared = import ../shared.nix {inherit pkgs;};
+  scripts = import ../scripts {inherit pkgs;};
 in
   with sources.psl1ght; (final: prev: {
     psl1ght = prev.stdenv.mkDerivation {
       name = "psl1ght";
-      nativeBuildInputs = with prev; [
-        cmake
-        pkg-config
-        libelf
-        gmp.dev
-        ncurses
-        ncurses.dev
-        zlib
-        zlib.dev
-        autoconf
-        automake
-        bison
-        flex
-        bzip2
-        gettext
-        openssl
-        libtool
-        gnumake
-        gnupatch
-        texinfo
-        nvidia_cg_toolkit
-      ];
-      buildInputs = with prev; [wget python310];
-      hardeningDisable = ["format"];
+      inherit (shared) buildInputs hardeningDisable;
+      nativeBuildInputs = shared.nativeBuildInputs ++ [pkgs.nvidia_cg_toolkit];
       phases = "installPhase";
       installPhase =
         /*
         bash
         */
         ''
-          mkdir -p $out
+          mkdir -p $out/build $out/ppu/ppu/lib
           export PS3DEV="$out"
           export PSL1GHT="$PS3DEV"
-          export PATH="$PATH:${pkgs.ps3toolchain}/bin:${pkgs.ps3toolchain}/ppu/bin:${pkgs.ps3toolchain}/spu/bin"
-          mkdir -p $out/build $out/ppu/ppu/lib
+          export PATH="$PATH:${pkgs.ps3toolchain}/ppu/bin:${pkgs.ps3toolchain}/spu/bin"
           cd $out/build
           cp -r ${src} ${name}
           if [ ! -d ${pname}-${version} ]; then
@@ -51,6 +30,7 @@ in
           make
           make install
           rm -rf $out/build
+          ${scripts.symlinks}/bin/create_symlinks ${pkgs.ps3toolchain} $out
         '';
     };
   })

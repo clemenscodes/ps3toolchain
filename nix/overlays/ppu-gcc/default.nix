@@ -19,7 +19,7 @@ in
         mkdir -p $out/build $out/ps3
         export PS3DEV="$out/ps3"
         export PSL1GHT="$PS3DEV"
-        export PATH="$PATH:${ppu-binutils}/ppu/bin:${ppu-binutils}/bin"
+        ${scripts.symlinks}/bin/create_symlinks ${ppu-binutils} $PS3DEV
         cd $out/build
         ${scripts.copy}/bin/copy_if_not_exists ${src} ${name}
         ${scripts.copy}/bin/copy_if_not_exists ${sources.newlib.src} ${sources.newlib.name}

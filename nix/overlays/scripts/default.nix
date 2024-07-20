@@ -3,4 +3,5 @@
   copy = import ./copy_if_not_exists {inherit pkgs;};
   extract = import ./extract_if_not_exists {inherit pkgs;};
   symlink = import ./symlink_if_not_exists {inherit pkgs;};
+  symlinks = import ./create_symlinks {inherit pkgs;};
 }
