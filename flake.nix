@@ -25,11 +25,7 @@
       in {
         defaultPackage = pkgs.psl1ght;
         devShell = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            ps3toolchain
-            # psl1ght
-            # ps3libraries
-          ];
+          buildInputs = with pkgs; [psl1ght];
         };
       }
     );

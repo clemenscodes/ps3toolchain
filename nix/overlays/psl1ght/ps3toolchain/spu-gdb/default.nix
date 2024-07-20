@@ -3,8 +3,8 @@
   sources,
 }:
 with sources.ppu-gdb; let
-  scripts = import ../scripts {inherit pkgs;};
-  shared = import ../shared.nix {inherit pkgs;};
+  scripts = import ../../scripts {inherit pkgs;};
+  shared = import ../../shared.nix {inherit pkgs;};
 in
   pkgs.stdenv.mkDerivation {
     inherit (shared) nativeBuildInputs buildInputs hardeningDisable;

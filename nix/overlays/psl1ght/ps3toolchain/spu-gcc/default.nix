@@ -2,14 +2,14 @@
   pkgs,
   sources,
 }:
-with sources.ppu-gcc; let
-  scripts = import ../scripts {inherit pkgs;};
-  shared = import ../shared.nix {inherit pkgs;};
-  ppu-binutils = import ../ppu-binutils {inherit pkgs sources;};
+with sources.spu-gcc; let
+  spu-binutils = import ../spu-binutils {inherit pkgs sources;};
+  scripts = import ../../scripts {inherit pkgs;};
+  shared = import ../../shared.nix {inherit pkgs;};
 in
   pkgs.stdenv.mkDerivation {
     inherit (shared) nativeBuildInputs buildInputs hardeningDisable;
-    name = "ppu-gcc";
+    name = "spu-gcc";
     phases = "installPhase";
     installPhase =
       /*
@@ -19,7 +19,7 @@ in
         mkdir -p $out/build $out/ps3
         export PS3DEV="$out/ps3"
         export PSL1GHT="$PS3DEV"
-        ${scripts.symlinks}/bin/create_symlinks ${ppu-binutils} $PS3DEV
+        ${scripts.symlinks}/bin/create_symlinks ${spu-binutils} $PS3DEV
         cd $out/build
         ${scripts.copy}/bin/copy_if_not_exists ${src} ${name}
         ${scripts.copy}/bin/copy_if_not_exists ${sources.newlib.src} ${sources.newlib.name}
@@ -33,7 +33,7 @@ in
         ${scripts.extract}/bin/extract_if_not_exists ${dependencies.mpfr.name} xfvj ${dependencies.mpfr.pname}-${dependencies.mpfr.version}
         ${scripts.extract}/bin/extract_if_not_exists ${dependencies.gmp.name} xfvj ${dependencies.gmp.pname}-${dependencies.gmp.version}
         ${scripts.extract}/bin/extract_if_not_exists ${dependencies.isl.name} xfvj ${dependencies.isl.pname}-${dependencies.isl.version}
-        ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/${pname}-${version}-PS3-PPU.patch} ./${pname}-${version}
+        ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/${pname}-${version}-PS3-SPU.patch} ./${pname}-${version}
         ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/${sources.newlib.pname}-${sources.newlib.version}-PS3.patch} ./${sources.newlib.pname}-${sources.newlib.version}
         cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub ${pname}-${version}
         cd ${pname}-${version}
@@ -43,20 +43,20 @@ in
         ${scripts.symlink}/bin/symlink_if_not_exists ../${dependencies.mpfr.pname}-${dependencies.mpfr.version} ${dependencies.mpfr.pname}
         ${scripts.symlink}/bin/symlink_if_not_exists ../${dependencies.gmp.pname}-${dependencies.gmp.version} ${dependencies.gmp.pname}
         ${scripts.symlink}/bin/symlink_if_not_exists ../${dependencies.isl.pname}-${dependencies.isl.version} ${dependencies.isl.pname}
-        mkdir build-ppu
-        cd build-ppu
-        ../configure --prefix="$PS3DEV/ppu" --target="powerpc64-ps3-elf" \
-          --with-cpu="cell" \
-          --with-newlib \
-          --with-system-zlib \
+        mkdir -p build-spu
+        cd build-spu
+        unset CFLAGS CXXFLAGS LDFLAGS
+        CFLAGS_FOR_TARGET="-Os -fpic -ffast-math -ftree-vectorize -funroll-loops -fschedule-insns -mdual-nops -mwarn-reloc" \
+        ../configure --prefix="$PS3DEV/spu" --target="spu" \
           --enable-languages="c,c++" \
-          --enable-long-double-128 \
           --enable-lto \
           --enable-threads \
           --enable-newlib-multithread \
           --enable-newlib-hw-fp \
+          --enable-obsolete \
           --disable-dependency-tracking \
           --disable-libcc1 \
+          --disable-libssp \
           --disable-multilib \
           --disable-nls \
           --disable-shared \
@@ -64,16 +64,6 @@ in
         PROCS="$(nproc --all 2>&1)" || ret=$?
         if [ ! -z $ret ]; then PROCS=4; fi
         make -j $PROCS all && make install
-        cd $PS3DEV/ppu
-        if [ ! -d ppu -a ! -f ppu -a ! -h ppu -a -d powerpc64-ps3-elf ]; then
-          ln -s powerpc64-ps3-elf ppu
-        fi
-        cd $PS3DEV/ppu/bin
-        for i in `ls powerpc64-ps3-elf-* | cut -c19-`; do
-          if [ ! -f ppu-$i -a ! -h ppu-$i -a -f powerpc64-ps3-elf-$i ]; then
-            ln -s powerpc64-ps3-elf-$i ppu-$i
-          fi
-        done
         cd $out
         mv $out/ps3/* $out
         rm -rf $out/ps3 $out/build

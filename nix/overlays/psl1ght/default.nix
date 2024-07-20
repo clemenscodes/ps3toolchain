@@ -1,7 +1,8 @@
 {pkgs}: let
-  sources = import ../sources.nix {inherit pkgs;};
-  shared = import ../shared.nix {inherit pkgs;};
-  scripts = import ../scripts {inherit pkgs;};
+  ps3toolchain = import ./ps3toolchain {inherit pkgs;};
+  scripts = import ./scripts {inherit pkgs;};
+  sources = import ./sources.nix {inherit pkgs;};
+  shared = import ./shared.nix {inherit pkgs;};
 in
   with sources.psl1ght; (final: prev: {
     psl1ght = prev.stdenv.mkDerivation {
@@ -17,7 +18,7 @@ in
           mkdir -p $out/build $out/ppu/ppu/lib
           export PS3DEV="$out"
           export PSL1GHT="$PS3DEV"
-          export PATH="$PATH:${pkgs.ps3toolchain}/ppu/bin:${pkgs.ps3toolchain}/spu/bin"
+          export PATH="$PATH:${ps3toolchain}/ppu/bin:${ps3toolchain}/spu/bin"
           cd $out/build
           cp -r ${src} ${name}
           if [ ! -d ${pname}-${version} ]; then
@@ -30,7 +31,7 @@ in
           make
           make install
           rm -rf $out/build
-          ${scripts.symlinks}/bin/create_symlinks ${pkgs.ps3toolchain} $out
+          ${scripts.symlinks}/bin/create_symlinks ${ps3toolchain} $out
         '';
     };
   })
