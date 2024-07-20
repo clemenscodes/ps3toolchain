@@ -65,62 +65,67 @@ in
       url = "https://ftp.gnu.org/gnu/gcc/gcc-${version}/gcc-${version}.tar.xz";
       sha256 = "sha256-J3afZO8dTNXivoaCwMk/mIeYPmz9GpJ85aCikVqVz48=";
     };
-    phases = "installPhase";
-    installPhase =
-      /*
-      bash
-      */
-      ''
-        mkdir -p $out/build $out/ps3
-        export PS3DEV="$out/ps3"
-        export PSL1GHT="$PS3DEV"
-        ${scripts.symlinks}/bin/create_symlinks ${spu-binutils} $PS3DEV
-        cd $out/build
-        ${scripts.copy}/bin/copy_if_not_exists ${src} ${name}.tar.xz
-        ${scripts.copy}/bin/copy_if_not_exists ${newlib.src} ${newlib.name}.tar.gz
-        ${scripts.copy}/bin/copy_if_not_exists ${mpc.src} ${mpc.name}.tar.gz
-        ${scripts.copy}/bin/copy_if_not_exists ${mpfr.src} ${mpfr.name}.tar.bz2
-        ${scripts.copy}/bin/copy_if_not_exists ${gmp.src} ${gmp.name}.tar.bz2
-        ${scripts.copy}/bin/copy_if_not_exists ${isl.src} ${isl.name}.tar.bz2
-        ${scripts.extract}/bin/extract_if_not_exists ${name}.tar.xz xfvJ gcc-${version}
-        ${scripts.extract}/bin/extract_if_not_exists ${newlib.name}.tar.gz xfvz newlib-${newlib.version}
-        ${scripts.extract}/bin/extract_if_not_exists ${mpc.name}.tar.gz xfv mpc-${mpc.version}
-        ${scripts.extract}/bin/extract_if_not_exists ${mpfr.name}.tar.bz2 xfvj mpfr-${mpfr.version}
-        ${scripts.extract}/bin/extract_if_not_exists ${gmp.name}.tar.bz2 xfvj gmp-${gmp.version}
-        ${scripts.extract}/bin/extract_if_not_exists ${isl.name}.tar.bz2 xfvj isl-${isl.version}
-        ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/${pname}-${version}-PS3.patch} ./gcc-${version}
-        ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/${newlib.pname}-${newlib.version}-PS3.patch} ./newlib-${newlib.version}
-        cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub gcc-${version}
-        cd gcc-${version}
-        ${scripts.symlink}/bin/symlink_if_not_exists ../newlib-${newlib.version}/newlib newlib
-        ${scripts.symlink}/bin/symlink_if_not_exists ../newlib-${newlib.version}/libgloss libgloss
-        ${scripts.symlink}/bin/symlink_if_not_exists ../mpc-${mpc.version} mpc
-        ${scripts.symlink}/bin/symlink_if_not_exists ../mpfr-${mpfr.version} mpfr
-        ${scripts.symlink}/bin/symlink_if_not_exists ../gmp-${gmp.version} gmp
-        ${scripts.symlink}/bin/symlink_if_not_exists ../isl-${isl.version} isl
-        mkdir -p build-spu
-        cd build-spu
-        unset CFLAGS CXXFLAGS LDFLAGS
-        CFLAGS_FOR_TARGET="-Os -fpic -ffast-math -ftree-vectorize -funroll-loops -fschedule-insns -mdual-nops -mwarn-reloc" \
-        ../configure --prefix="$PS3DEV/spu" --target="spu" \
-          --enable-languages="c,c++" \
-          --enable-lto \
-          --enable-threads \
-          --enable-newlib-multithread \
-          --enable-newlib-hw-fp \
-          --enable-obsolete \
-          --disable-dependency-tracking \
-          --disable-libcc1 \
-          --disable-libssp \
-          --disable-multilib \
-          --disable-nls \
-          --disable-shared \
-          --disable-win32-registry
-        PROCS="$(nproc --all 2>&1)" || ret=$?
-        if [ ! -z $ret ]; then PROCS=4; fi
-        make -j $PROCS all && make install
-        cd $out
-        mv $out/ps3/* $out
-        rm -rf $out/ps3 $out/build
-      '';
+    unpackPhase = ''
+      export PS3DEV=${placeholder "out"}/ps3
+      export PSL1GHT=$PS3DEV
+      ${scripts.copy}/bin/copy_if_not_exists ${src} ${name}.tar.xz
+      ${scripts.extract}/bin/extract_if_not_exists ${name}.tar.xz xvf gcc-${version}
+      cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub gcc-${version}
+      ${scripts.symlinks}/bin/create_symlinks ${spu-binutils} $PS3DEV
+      ${scripts.copy}/bin/copy_if_not_exists ${src} ${name}.tar.xz
+      ${scripts.copy}/bin/copy_if_not_exists ${newlib.src} ${newlib.name}.tar.gz
+      ${scripts.copy}/bin/copy_if_not_exists ${mpc.src} ${mpc.name}.tar.gz
+      ${scripts.copy}/bin/copy_if_not_exists ${mpfr.src} ${mpfr.name}.tar.bz2
+      ${scripts.copy}/bin/copy_if_not_exists ${gmp.src} ${gmp.name}.tar.bz2
+      ${scripts.copy}/bin/copy_if_not_exists ${isl.src} ${isl.name}.tar.bz2
+      ${scripts.extract}/bin/extract_if_not_exists ${name}.tar.xz xfv gcc-${version}
+      ${scripts.extract}/bin/extract_if_not_exists ${newlib.name}.tar.gz xfvz newlib-${newlib.version}
+      ${scripts.extract}/bin/extract_if_not_exists ${mpc.name}.tar.gz xfv mpc-${mpc.version}
+      ${scripts.extract}/bin/extract_if_not_exists ${mpfr.name}.tar.bz2 xfvj mpfr-${mpfr.version}
+      ${scripts.extract}/bin/extract_if_not_exists ${gmp.name}.tar.bz2 xfvj gmp-${gmp.version}
+      ${scripts.extract}/bin/extract_if_not_exists ${isl.name}.tar.bz2 xfvj isl-${isl.version}
+      cp ${pkgs.gnu-config}/config.guess ${pkgs.gnu-config}/config.sub gcc-${version}
+      cd gcc-${version}
+      ${scripts.symlink}/bin/symlink_if_not_exists ../newlib-${newlib.version}/newlib newlib
+      ${scripts.symlink}/bin/symlink_if_not_exists ../newlib-${newlib.version}/libgloss libgloss
+      ${scripts.symlink}/bin/symlink_if_not_exists ../mpc-${mpc.version} mpc
+      ${scripts.symlink}/bin/symlink_if_not_exists ../mpfr-${mpfr.version} mpfr
+      ${scripts.symlink}/bin/symlink_if_not_exists ../gmp-${gmp.version} gmp
+      ${scripts.symlink}/bin/symlink_if_not_exists ../isl-${isl.version} isl
+    '';
+    patchPhase = ''
+      ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/${pname}-${version}-PS3.patch} .
+      ${scripts.patch}/bin/apply_patch_if_not_applied ${./patches/${newlib.pname}-${newlib.version}-PS3.patch} ../newlib-${newlib.version}
+    '';
+    configurePhase = ''
+      mkdir build-spu
+      cd build-spu
+      unset CFLAGS CXXFLAGS LDFLAGS
+      CFLAGS_FOR_TARGET="-Os -fpic -ffast-math -ftree-vectorize -funroll-loops -fschedule-insns -mdual-nops -mwarn-reloc" \
+      ../configure --prefix="$PS3DEV/spu" --target="spu" \
+        --enable-languages="c,c++" \
+        --enable-lto \
+        --enable-threads \
+        --enable-newlib-multithread \
+        --enable-newlib-hw-fp \
+        --enable-obsolete \
+        --disable-dependency-tracking \
+        --disable-libcc1 \
+        --disable-libssp \
+        --disable-multilib \
+        --disable-nls \
+        --disable-shared \
+        --disable-win32-registry
+    '';
+    buildPhase = ''
+      make -j $PROCS all
+    '';
+    installPhase = ''
+      mkdir -p $out/build $out/ps3
+      make install
+    '';
+    fixupPhase = ''
+      mv $out/ps3/* $out
+      rm -rf $out/build $out/ps3
+    '';
   }
