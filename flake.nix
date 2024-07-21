@@ -17,9 +17,6 @@
         inherit (import ./nix {inherit pkgs;}) overlays;
         pkgs = import nixpkgs {
           inherit system overlays;
-          config = {
-            allowUnfreePredicate = pkg: builtins.elem (pkgs.lib.getName pkg) ["nvidia-cg-toolkit"];
-          };
         };
       in
         with pkgs; {

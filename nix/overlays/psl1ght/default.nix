@@ -13,7 +13,7 @@ in (final: prev: {
       url = "https://github.com/ps3dev/${pname}/tarball/${version}";
       sha256 = "sha256-bLrSAZyhoglKcTzKo+zPCPSfO4TmzKTM1dNBE8rtiXY=";
     };
-    nativeBuildInputs = shared.nativeBuildInputs ++ [prev.nvidia_cg_toolkit];
+    nativeBuildInputs = shared.nativeBuildInputs;
     inherit (shared) buildInputs hardeningDisable;
     phases = "unpackPhase buildPhase installPhase fixupPhase";
     unpackPhase = ''
