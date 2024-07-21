@@ -14,9 +14,9 @@
   }:
     flake-utils.lib.eachDefaultSystem (
       system: let
+        inherit (import ./nix {inherit pkgs;}) overlays;
         pkgs = import nixpkgs {
-          inherit system;
-          inherit (import ./nix {inherit pkgs;}) overlays;
+          inherit system overlays;
           config = {
             allowUnfreePredicate = pkg: builtins.elem (pkgs.lib.getName pkg) ["nvidia-cg-toolkit"];
           };
@@ -33,6 +33,9 @@
               export PATH=$PATH:${psl1ght}/ppu/bin
               export PATH=$PATH:${psl1ght}/spu/bin
             '';
+          };
+          overlays = {
+            default = import ./nix/overlays/psl1ght {inherit pkgs;};
           };
         }
     );
