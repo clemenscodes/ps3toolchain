@@ -33,7 +33,7 @@ stdenv.mkDerivation rec {
   '';
   configureFlags =
     [
-      "--prefix=$PS3DEV/${prefix}"
+      "--prefix=${placeholder "out"}/ps3/${prefix}"
       "--target=${target}"
       "--disable-nls "
       "--disable-shared"

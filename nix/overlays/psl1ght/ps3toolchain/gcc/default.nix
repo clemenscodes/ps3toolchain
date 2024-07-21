@@ -60,13 +60,9 @@ stdenv.mkDerivation rec {
   '';
   configureFlags =
     [
-      "--prefix=$PS3DEV/${prefix}"
+      "--prefix=${placeholder "out"}/ps3/${prefix}"
       "--target=${target}"
-      "--with-cpu=cell"
-      "--with-newlib"
-      "--with-system-zlib"
       "--enable-languages=c,c++"
-      "--enable-long-double-128"
       "--enable-lto"
       "--enable-threads"
       "--enable-newlib-multithread"
@@ -77,6 +73,13 @@ stdenv.mkDerivation rec {
       "--disable-nls"
       "--disable-shared"
       "--disable-win32-registry"
+    ]
+    ++ lib.optional (prefix == "ppu")
+    [
+      "--with-cpu=cell"
+      "--with-newlib"
+      "--with-system-zlib"
+      "--enable-long-double-128"
     ]
     ++ lib.optional (prefix == "spu") [
       "--enable-obsolete"
