@@ -1,11 +1,14 @@
 {pkgs}: let
   scripts = import ../scripts {inherit pkgs;};
+
   shared = import ../shared.nix {inherit pkgs;};
+
   args = {
     inherit scripts;
     inherit (shared) nativeBuildInputs buildInputs hardeningDisable;
     inherit (pkgs) stdenv fetchurl gnu-config lib;
   };
+
   callPackage = pkgs.lib.callPackageWith (pkgs // args);
 
   isPPU = prefix: prefix == "ppu";
@@ -34,7 +37,7 @@
     version,
     sha256,
   }:
-    callPackage ./binutils rec {
+    callPackage ./binutils {
       target = mkTarget prefix;
       inherit prefix version sha256;
     };
@@ -45,7 +48,7 @@
     sha256,
     binutils,
   }:
-    callPackage ./gcc rec {
+    callPackage ./gcc {
       target = mkTarget prefix;
       inherit prefix version sha256 binutils;
       inherit (mkComponents prefix) newlib mpfr mpc gmp isl;
@@ -109,6 +112,16 @@
     };
   };
 
+  mkGdb = {
+    prefix,
+    version,
+    sha256,
+  }:
+    callPackage ./gdb {
+      target = mkTarget prefix;
+      inherit prefix version sha256;
+    };
+
   ppu-binutils = mkBinutils {
     prefix = "ppu";
     version = "2.42";
@@ -135,8 +148,17 @@
     binutils = spu-binutils;
   };
 
-  ppu-gdb = import ./ppu-gdb {inherit pkgs;};
-  spu-gdb = import ./spu-gdb {inherit pkgs;};
+  ppu-gdb = mkGdb {
+    prefix = "ppu";
+    version = "8.3.1";
+    sha256 = "sha256-HlW0183KezS+EvTOrmUWI6pzsv1kAVIxP59mpxSXV8Q=";
+  };
+
+  spu-gdb = mkGdb {
+    prefix = "spu";
+    version = "8.3.1";
+    sha256 = "sha256-HlW0183KezS+EvTOrmUWI6pzsv1kAVIxP59mpxSXV8Q=";
+  };
 in
   pkgs.stdenv.mkDerivation {
     name = "ps3toolchain";
