@@ -25,7 +25,7 @@
     version,
     ext,
     sha256,
-    url ? mkUrl "${pname}-${version}.${ext}",
+    url,
   }: rec {
     inherit pname version;
     name = "${pname}-${version}.${ext}";
@@ -60,9 +60,9 @@
       version = "1.20.0";
       ext = "tar.gz";
       sha256 = "14pn7y1dm8vsm9lszfgkcz3sgdgsv1lxmpf2prbqq9s4fa2b4i66";
-      url = "ftp://sourceware.org/pub/newlib/";
+      url = "ftp://sourceware.org/pub/newlib/newlib-1.20.0.tar.gz";
     };
-    mpfr = fetch {
+    mpfr = fetch rec {
       pname = "${prefix}-mpfr";
       version =
         if isPPU prefix
@@ -73,8 +73,9 @@
         if isPPU prefix
         then "sha256-/s7S1DDdWpeAX6KJ/tP8j/KwlMAtBSh/1hM+fx8OySY="
         else "sha256-0xA6gM2tJAftWB82GMS+0E4MktHPdxpl6tZizDl/d3U=";
+      url = mkUrl "mpfr-${version}.${ext}";
     };
-    mpc = fetch {
+    mpc = fetch rec {
       pname = "${prefix}-mpc";
       version =
         if isPPU prefix
@@ -85,8 +86,9 @@
         if isPPU prefix
         then "sha256-F1A9LDld/PEGtiLcFCaDwRmUMdCVNnxqrLpu7DA0BFk="
         else "sha256-YX3sxuoJiJ+wjt4zCRegCxaAm424jCnDG/u0nL+I7MM=";
+      url = mkUrl "mpc-${version}.${ext}";
     };
-    gmp = fetch {
+    gmp = fetch rec {
       pname = "${prefix}-gmp";
       version =
         if isPPU prefix
@@ -97,8 +99,9 @@
         if isPPU prefix
         then "sha256-6ukya+tBWMOG45o1aBgDG9KPMSTPkV+MWx3Ex6NrTXw="
         else "sha256-SYRJqZTv66UniFwQQFmTQnmV0/hrh2jYzfjZ3Xxrc+g";
+      url = mkUrl "gmp-${version}.${ext}";
     };
-    isl = fetch {
+    isl = fetch rec {
       pname = "${prefix}-isl";
       version =
         if isPPU prefix
@@ -109,6 +112,7 @@
         if isPPU prefix
         then "sha256-/PeN2WVsEOuM+fvV9ZoLawE4YgX+GTSzsoegoYmBRcA="
         else "sha256-a4sP1/gdCpV76zZ5yBu7NMzHVo1WgoRNiSRCSg2tyxs=";
+      url = mkUrl "isl-${version}.${ext}";
     };
   };
 
